@@ -39,7 +39,7 @@ $(NAME).hex:	$(OBJECTS)
 				@$(CROSS_LD) -r $(OBJECTS) -o $(NAME).o
 				@echo [LD] final link
 				@$(CROSS_CC) $(CROSS_CFLAGS) $(NAME).o -o $(NAME).elf
-				@$(CROSS_SIZE) $(NAME).elf | grep $(NAME).elf | awk '{print "[Si] Flash_Size = "$$1" bytes"}'
+				@$(CROSS_SIZE) $(NAME).elf | grep $(NAME).elf | awk '{print "[Si] Program_Size = "$$1" bytes"}'
 				@echo [HX] generate hex file
 				@$(HEXIFY) $(NAME).elf $(NAME).hex
 
