@@ -31,21 +31,28 @@ SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 #-------------------INTRO_RULES------------------------------------------------------
-all:		$(NAME).hex
+all:			$(NAME).hex
 
 $(NAME).hex:	$(OBJECTS)
-				$(CROSS_LD) -r $(OBJECTS) -o $(NAME).o
-				$(HEXIFY) $(NAME).o $(NAME).hex
+				@echo [LD] relink
+				@$(CROSS_LD) -r $(OBJECTS) -o $(NAME).o
+				@echo [LD] final link
+				@$(CROSS_CC) $(CROSS_CFLAGS) $(NAME).o -o $(NAME).elf
+				@echo [HX] generate hex file
+				@$(HEXIFY) $(NAME).elf $(NAME).hex
 
 #-------------------GENERIC_RULES----------------------------------------------------
-%.o:		%.c
-			$(CROSS_CC) $(CROSS_CFLAGS) ${^} -o ${@}
+%.o:			%.c
+				@echo [CC] $@
+				@$(CROSS_CC) -c $(CROSS_CFLAGS) ${^} -o ${@}
 
 #-------------------SPECIFIC_RULES---------------------------------------------------
-prog:		$(NAME).hex
-			avrdude -c usbasp -p t85 -e -U flash:w:$(NAME).hex
+prog:			$(NAME).hex
+				@echo [PR] program flash
+				@avrdude -c usbasp -p t85 -e -U flash:w:$(NAME).hex
 
 clean:
-			rm -f *.o *.o *.hex *.elf 
+				@echo [CL] clean
+				@rm -f *.o *.o *.hex *.elf 
 
 distclean:	clean
