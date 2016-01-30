@@ -2,7 +2,6 @@
 # ATTiny85 Makefile
 # Stefan Koch
 #####################################################################################
-# @${AVR}size ${@}|sed '1d'
 
 NAME = hello
 
@@ -15,6 +14,7 @@ CROSS_COMPILE = avr-
 CROSS_CC      = $(CROSS_COMPILE)gcc
 CROSS_LD      = $(CROSS_COMPILE)gcc
 CROSS_OBJCOPY = $(CROSS_COMPILE)objcopy
+CROSS_SIZE    = $(CROSS_COMPILE)size
 
 # HEXIFY requires the .o and .hex filename to be appended
 HEXIFY        = $(CROSS_OBJCOPY) -j .text -j .data -O ihex
@@ -28,6 +28,7 @@ CROSS_LDFLAGS = -g -mmcu=$(DEVICE)
 
 #-------------------GENERIC_DEFS-----------------------------------------------------
 SOURCES = $(wildcard *.c)
+HEADERS = $(wildcard *.h)
 OBJECTS = $(SOURCES:.c=.o)
 
 #-------------------INTRO_RULES------------------------------------------------------
@@ -38,6 +39,7 @@ $(NAME).hex:	$(OBJECTS)
 				@$(CROSS_LD) -r $(OBJECTS) -o $(NAME).o
 				@echo [LD] final link
 				@$(CROSS_CC) $(CROSS_CFLAGS) $(NAME).o -o $(NAME).elf
+				@$(CROSS_SIZE) $(NAME).elf | grep $(NAME).elf | awk '{print "[Si] Flash_Size = "$$1" bytes"}'
 				@echo [HX] generate hex file
 				@$(HEXIFY) $(NAME).elf $(NAME).hex
 
